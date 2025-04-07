@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>您的个性化营养计划 | 科学营养计划生成器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --light: #f5f5f5;
+            --medium: #e0e0e0;
+            --dark: #212121;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1350&q=80') center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .nav-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(56, 142, 60, 0.1));
+            border-left: 4px solid var(--primary);
+        }
+
+        .target-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .badge-lose_fat {
+            background: #FF9800;
+            color: white;
+        }
+
+        .badge-hypertension {
+            background: #2196F3;
+            color: white;
+        }
+
+        .badge-diabetes {
+            background: #9C27B0;
+            color: white;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .food-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .food-img {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .food-score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .score-high {
+            background: var(--primary);
+        }
+
+        .score-medium {
+            background: var(--warning);
+        }
+
+        .score-low {
+            background: var(--danger);
+        }
+
+        .food-content {
+            padding: 1rem;
+        }
+
+        .food-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .food-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .food-nutrients {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .nutrient-item {
+            font-size: 0.8rem;
+        }
+
+        .nutrient-value {
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .nutrition-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .tips-card {
+            background: #FFF9C4;
+            border-left: 4px solid #FFD600;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .tips-title {
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .tips-title i {
+            margin-right: 10px;
+            color: #F57F17;
+        }
+
+        .tips-list {
+            list-style-type: none;
+        }
+
+        .tips-list li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .tips-list li::before {
+            content: "•";
+            color: var(--primary);
+            font-size: 1.5rem;
+            position: absolute;
+            left: 5px;
+            top: -5px;
+        }
+
+        .scoring-system {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+}
+
+        .score-category {
+            background: rgba(76, 175, 80, 0.05);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 10px;
+        }
+
+        .category-header i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .category-header h3 {
+            flex-grow: 1;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .total-points {
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .criteria-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .criteria-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+
+        .criteria-list li:last-child {
+            border-bottom: none;
+        }
+
+        .points {
+            display: inline-block;
+            width: 50px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .scoring-note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--dark);
+            font-size: 0.9rem;
+            background: var(--white);
+            margin-top: 2rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .food-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nutrition-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-btn {
+                position: static;
+                margin-bottom: 1rem;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <button class="nav-btn" onclick="window.location.href='/'">
+                <i class="fas fa-arrow-left"></i> 返回
+            </button>
+            <h1>您的个性化营养计划</h1>
+            <p class="subtitle">基于您的目标和身体数据科学定制</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card summary-card">
+            <div class="target-badge badge-{{ target }}">
+                {% if target == 'lose_fat' %}减脂计划
+                {% elif target == 'hypertension' %}高血压管理
+                {% elif target == 'diabetes' %}糖尿病管理
+                {% else %}均衡饮食{% endif %}
+            </div>
+            <h2>计划概览</h2>
+            <p>根据您的体重({{ weight }}kg)和健康目标，我们为您推荐以下科学饮食方案。</p>
+
+            <div class="nutrition-stats">
+                <div class="stat-card">
+                    <div class="stat-label">蛋白质占比</div>
+                    <div class="stat-value">{{ protein_ratio }}%</div>
+                    <div class="stat-desc">(理想范围: 15-30%)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">膳食纤维/1000kcal</div>
+                    <div class="stat-value">{{ fiber_ratio }}g</div>
+                    <div class="stat-desc">(推荐: ≥14g)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">平均钠含量</div>
+                    <div class="stat-value">{{ avg_sodium }}mg</div>
+                    <div class="stat-desc">(推荐: <300mg)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>推荐食物组合</h2>
+            <p>以下食物组合经过科学评分，最适合您的健康目标：</p>
+
+            <div class="food-grid">
+                {% for food in foods %}
+                <div class="food-card" onclick="window.location.href='/details/{{ food['Food Names'] }}'">
+                    <div class="food-img" style="background-image: url('https://source.unsplash.com/300x200/?{{ food['Food Names'] }}')">
+                        <div class="food-score {% if food.score >= 70 %}score-high{% elif food.score >= 40 %}score-medium{% else %}score-low{% endif %}">
+                            营养评分: {{ food.score }}/100
+                        </div>
+                    </div>
+                    <div class="food-content">
+                        <h3 class="food-title">{{ food['Food Names'] }}</h3>
+                        <div class="food-meta">
+                            <span>{{ food.Calories }} kcal</span>
+                            <span>{{ food.Protein }}g 蛋白质</span>
+                        </div>
+                        <div class="food-nutrients">
+                            <div class="nutrient-item">
+                                <span>脂肪: </span>
+                                <span class="nutrient-value">{{ food.Fat }}g</span>
+                            </div>
+                            <div class="nutrient-item">
+                                <span>碳水: </span>
+                                <span class="nutrient-value">{{ food.Carbohydrates }}g</span>
+                            </div>
+                            <div class="nutrient-item">
+                                <span>钠: </span>
+                                <span class="nutrient-value">{{ food.Sodium }}mg</span>
+                            </div>
+                            <div class="nutrient-item">
+                                <span>纤维: </span>
+                                <span class="nutrient-value">{{ food.Fiber }}g</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tips-card">
+            <h3 class="tips-title"><i class="fas fa-lightbulb"></i> 健康小贴士</h3>
+            <ul class="tips-list">
+                {% for tip in tips %}
+                <li>{{ tip }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+    <h2>我们的科学评分体系</h2>
+    <p>为确保推荐食物的营养价值，我们开发了多维营养平衡评分系统(NutriScore 2.0)：</p>
+
+    <div class="scoring-system">
+        <div class="score-category">
+            <div class="category-header">
+                <i class="fas fa-dumbbell"></i>
+                <h3>蛋白质质量</h3>
+                <span class="total-points">30分</span>
+            </div>
+            <ul class="criteria-list">
+                <li><span class="points">30分</span> >20g/100g</li>
+                <li><span class="points">20分</span> >10g/100g</li>
+                <li><span class="points">10分</span> >5g/100g</li>
+            </ul>
+        </div>
+
+        <div class="score-category">
+            <div class="category-header">
+                <i class="fas fa-seedling"></i>
+                <h3>膳食纤维</h3>
+                <span class="total-points">20分</span>
+            </div>
+            <ul class="criteria-list">
+                <li><span class="points">20分</span> >5g/100g</li>
+                <li><span class="points">10分</span> >3g/100g</li>
+                <li><span class="points">5分</span> >1g/100g</li>
+            </ul>
+        </div>
+
+        <div class="score-category">
+            <div class="category-header">
+                <i class="fas fa-prescription-bottle-alt"></i>
+                <h3>钠含量</h3>
+                <span class="total-points">20分</span>
+            </div>
+            <ul class="criteria-list">
+                <li><span class="points">20分</span> <300mg/100g</li>
+                <li><span class="points">10分</span> <500mg/100g</li>
+                <li><span class="points">0分</span> ≥500mg/100g</li>
+            </ul>
+        </div>
+
+        <div class="score-category">
+            <div class="category-header">
+                <i class="fas fa-pills"></i>
+                <h3>维生素矿物质</h3>
+                <span class="total-points">30分</span>
+            </div>
+            <ul class="criteria-list">
+                <li><span class="points">15分</span> 维生素C >10mg</li>
+                <li><span class="points">10分</span> 维生素C >5mg</li>
+                <li><span class="points">15分</span> 铁+钙 >10mg</li>
+            </ul>
+        </div>
+    </div>
+
+    <p class="scoring-note">所有推荐食物均经过此评分系统验证，确保其营养价值符合您的健康目标。</p>
+            <button class="btn" onclick="window.location.href='/'">
+                <i class="fas fa-redo"></i> 重新生成计划
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 科学营养计划生成器 | 本建议仅供参考，如有特殊健康需求请咨询专业医师</p>
+    </footer>
+</body>
+</html>

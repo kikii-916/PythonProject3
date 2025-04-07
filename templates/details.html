@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ food['Food Names'] }} | 食物详情</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --light: #f5f5f5;
+            --medium: #e0e0e0;
+            --dark: #212121;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://source.unsplash.com/800x300/?{{ food['Food Names'] }}') center/cover;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .nav-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .food-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .food-score {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+
+        .score-high {
+            background: var(--primary);
+            color: white;
+        }
+
+        .score-medium {
+            background: var(--warning);
+            color: white;
+        }
+
+        .score-low {
+            background: var(--danger);
+            color: white;
+        }
+
+        .nutrient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .nutrient-card {
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .nutrient-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .nutrient-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .nutrition-facts {
+            background: #f5f5f5;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .nutrition-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .nutrition-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .nutrition-row:last-child {
+            border-bottom: none;
+        }
+
+        .nutrition-name {
+            font-weight: 500;
+        }
+
+        .nutrition-value {
+            font-weight: 500;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--dark);
+            font-size: 0.9rem;
+            background: var(--white);
+            margin-top: 2rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .nutrient-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-btn {
+                position: static;
+                margin-bottom: 1rem;
+                display: inline-block;
+            }
+
+            .food-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .food-score {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <button class="nav-btn" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> 返回
+            </button>
+            <h1>{{ food['Food Names'] }}</h1>
+            <p>每100克可食用部分的营养成分</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <div class="food-header">
+                <h2>{{ food['Food Names'] }}</h2>
+                <div class="food-score {% if food.score >= 70 %}score-high{% elif food.score >= 40 %}score-medium{% else %}score-low{% endif %}">
+                    营养评分: {{ food.score }}/100
+                </div>
+            </div>
+
+            <div class="nutrient-grid">
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ food.Calories }}</div>
+                    <div class="nutrient-label">卡路里 (kcal)</div>
+                </div>
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ food.Protein }}g</div>
+                    <div class="nutrient-label">蛋白质</div>
+                </div>
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ food.Fat }}g</div>
+                    <div class="nutrient-label">脂肪</div>
+                </div>
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ food.Carbohydrates }}g</div>
+                    <div class="nutrient-label">碳水化合物</div>
+                </div>
+            </div>
+
+            <div class="nutrition-facts">
+                <div class="nutrition-title">详细营养成分</div>
+
+                <div class="nutrition-row">
+                    <span class="nutrition-name">膳食纤维</span>
+                    <span class="nutrition-value">{{ food.Fiber }}g</span>
+                </div>
+                <div class="nutrition-row">
+                    <span class="nutrition-name">糖分</span>
+                    <span class="nutrition-value">{{ food.Sugars }}g</span>
+                </div>
+                <div class="nutrition-row">
+                    <span class="nutrition-name">钠</span>
+                    <span class="nutrition-value">{{ food.Sodium }}mg</span>
+                </div>
+                <div class="nutrition-row">
+                    <span class="nutrition-name">维生素C</span>
+                    <span class="nutrition-value">{{ food.Vitamin_C }}mg</span>
+                </div>
+                <div class="nutrition-row">
+                    <span class="nutrition-name">铁</span>
+                    <span class="nutrition-value">{{ food.Iron }}mg</span>
+                </div>
+                <div class="nutrition-row">
+                    <span class="nutrition-name">钙</span>
+                    <span class="nutrition-value">{{ food.Calcium }}mg</span>
+                </div>
+            </div>
+
+            <h3>营养评分说明</h3>
+            <p>我们的评分系统(0-100分)综合考虑了蛋白质质量、膳食纤维含量、钠含量以及维生素矿物质含量。分数越高表示该食物营养价值越高，越适合健康饮食。</p>
+
+            <button class="btn" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> 返回计划
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 科学营养计划生成器 | 数据来源: 中国食物成分表</p>
+    </footer>
+</body>
+</html>

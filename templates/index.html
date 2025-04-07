@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科学营养计划生成器 | 个性化健康饮食方案</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --light: #f5f5f5;
+            --medium: #e0e0e0;
+            --dark: #212121;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1350&q=80') center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--medium);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            transition: var(--transition);
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .target-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .target-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .target-card:hover {
+            border-color: var(--primary);
+        }
+
+        .target-card.active {
+            border-color: var(--primary);
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        .target-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .target-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--dark);
+            font-size: 0.9rem;
+            background: var(--white);
+            margin-top: 2rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+<div class="header-content">
+            <h1>科学营养计划生成器</h1>
+            <p class="subtitle">基于专业营养学数据，为您定制个性化饮食方案</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <form id="nutrition-form" action="/plan" method="POST">
+                <div class="form-group">
+                    <label for="weight">您的体重 (kg)</label>
+                    <input type="number" id="weight" name="weight" min="30" max="200" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="target">您的营养目标</label>
+                    <select id="target" name="target" required>
+                        <option value="">-- 请选择 --</option>
+                        <option value="lose_fat">减脂/控制体重</option>
+                        <option value="gain_muscle">增肌/塑形</option>
+                        <option value="hypertension">控制血压</option>
+                        <option value="diabetes">控制血糖</option>
+                        <option value="balanced">均衡饮食</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>饮食偏好</label>
+                    <div class="preference-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preference" value="vegetarian"> 素食
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preference" value="low_carb"> 低碳水
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preference" value="high_protein"> 高蛋白
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preference" value="low_sodium"> 低钠
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="allergies">过敏或不耐受食物</label>
+                    <textarea id="allergies" name="allergies" rows="2" placeholder="例如：海鲜、花生、乳制品等"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="activity">日常活动量</label>
+                    <select id="activity" name="activity" required>
+                        <option value="sedentary">久坐少动</option>
+                        <option value="light">轻度活动(每周1-3次运动)</option>
+                        <option value="moderate">中度活动(每周3-5次运动)</option>
+                        <option value="active">高度活跃(每周6-7次运动)</option>
+                        <option value="extreme">极高强度(运动员级别)</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calculator"></i> 生成营养计划
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-section">
+            <h2><i class="fas fa-info-circle"></i> 我们的科学依据</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <i class="fas fa-database"></i>
+                    <h3>专业数据库</h3>
+                    <p>基于中国食物成分表和最新营养学研究数据</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-user-md"></i>
+                    <h3>专家建议</h3>
+                    <p>参考中国居民膳食指南和临床营养学建议</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>智能算法</h3>
+                    <p>根据您的个人特征和目标智能匹配最佳食物组合</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 科学营养计划生成器 | 本建议仅供参考，如有特殊健康需求请咨询专业医师</p>
+            <div class="footer-links">
+                <a href="#">关于我们</a>
+                <a href="#">隐私政策</a>
+                <a href="#">联系我们</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('nutrition-form').addEventListener('submit', function(e) {
+            const weight = document.getElementById('weight').value;
+            if (weight < 30 || weight > 200) {
+                alert('请输入合理的体重值(30-200kg)');
+                e.preventDefault();
+            }
+        });
+
+        document.getElementById('target').addEventListener('change', function() {
+            const target = this.value;
+        });
+    </script>
+</body>
+</html>
