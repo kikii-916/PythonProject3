@@ -6,6 +6,8 @@
     <title>您的个性化营养计划 | 科学营养计划生成器</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
     <style>
         :root {
             --primary: #4CAF50;
@@ -147,76 +149,65 @@
         .food-card {
             background: var(--white);
             border-radius: var(--radius);
-            overflow: hidden;
+            padding: 1rem;
             box-shadow: var(--shadow);
             transition: var(--transition);
             cursor: pointer;
-        }
-
-        .food-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .food-img {
-            height: 150px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
+            height: 100%;
         }
 
         .food-score {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+            position: static;
+            display: inline-block;
+            margin-bottom: 0.5rem;
             background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 5px 10px;
+            padding: 3px 8px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 500;
         }
 
         .score-high {
-            background: var(--primary);
+            background: var(--primary); /* 绿色 */
+            color: white;
         }
 
         .score-medium {
-            background: var(--warning);
+            background: var(--warning); /* 橙色 */
+            color: white;
         }
 
         .score-low {
-            background: var(--danger);
+            background: var(--danger); /* 红色 */
+            color: white;
         }
 
         .food-content {
-            padding: 1rem;
+            padding: 0;
         }
 
         .food-title {
             font-weight: 500;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
         }
 
         .food-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
         }
 
         .food-nutrients {
-            display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
         }
 
         .nutrient-item {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
         }
+
 
         .nutrient-value {
             font-weight: 500;
@@ -361,6 +352,149 @@
             border-top: 1px solid #eee;
         }
 
+        /* 新增的饮食日志样式 */
+        .meal-planner {
+            margin: 2rem 0;
+        }
+
+        .meal-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1rem;
+        }
+
+        .meal-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .meal-tab.active {
+            border-bottom-color: var(--primary);
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .meal-container {
+            display: none;
+        }
+
+        .meal-container.active {
+            display: block;
+        }
+
+        .meal-box {
+            min-height: 150px;
+            border: 2px dashed #ccc;
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .meal-box.highlight {
+            border-color: var(--primary);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .meal-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .meal-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .dropped-food {
+            background: white;
+            border-radius: var(--radius);
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropped-food .food-info {
+            flex-grow: 1;
+        }
+
+        .dropped-food .food-name {
+            font-weight: 500;
+        }
+
+        .dropped-food .food-calories {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .dropped-food .remove-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .nutrition-summary {
+            margin-top: 2rem;
+        }
+
+        .progress-container {
+            margin: 1rem 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .chart-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .chart-title {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+        }
 
         .btn {
             background: var(--primary);
@@ -382,6 +516,21 @@
             background: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background: var(--medium);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
         }
 
         footer {
@@ -407,6 +556,10 @@
                 position: static;
                 margin-bottom: 1rem;
                 display: inline-block;
+            }
+
+            .chart-container {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -456,41 +609,129 @@
             <h2>推荐食物组合</h2>
             <p>以下食物组合经过科学评分，最适合您的健康目标：</p>
 
-            <div class="food-grid">
-                {% for food in foods %}
-                <div class="food-card" onclick="window.location.href='/details/{{ food['Food Names'] }}'">
-                    <div class="food-img" style="background-image: url('https://source.unsplash.com/300x200/?{{ food['Food Names'] }}')">
-                        <div class="food-score {% if food.score >= 70 %}score-high{% elif food.score >= 40 %}score-medium{% else %}score-low{% endif %}">
-                            营养评分: {{ food.score }}/100
-                        </div>
+            <div class="food-grid" id="recommended-foods">
+            {% for food in foods %}
+            <div class="food-card draggable" draggable="true" data-id="{{ food.id }}" data-food='{{ food|tojson }}'>
+                <div class="food-score {% if food.score >= 70 %}score-high{% elif food.score >= 40 %}score-medium{% else %}score-low{% endif %}">
+                    营养评分: {{ food.score }}/100
+                </div>
+                <div class="food-content">
+                    <h3 class="food-title">{{ food['Food Names'] }}</h3>
+                    <div class="food-meta">
+                        <span>{{ food.Calories }} kcal</span>
+                        <span>{{ food.Protein }}g 蛋白质</span>
                     </div>
-                    <div class="food-content">
-                        <h3 class="food-title">{{ food['Food Names'] }}</h3>
-                        <div class="food-meta">
-                            <span>{{ food.Calories }} kcal</span>
-                            <span>{{ food.Protein }}g 蛋白质</span>
+                    <div class="food-nutrients">
+                        <div class="nutrient-item">
+                            <span>脂肪: </span>
+                            <span class="nutrient-value">{{ food.Fat }}g</span>
                         </div>
-                        <div class="food-nutrients">
-                            <div class="nutrient-item">
-                                <span>脂肪: </span>
-                                <span class="nutrient-value">{{ food.Fat }}g</span>
-                            </div>
-                            <div class="nutrient-item">
-                                <span>碳水: </span>
-                                <span class="nutrient-value">{{ food.Carbohydrates }}g</span>
-                            </div>
-                            <div class="nutrient-item">
-                                <span>钠: </span>
-                                <span class="nutrient-value">{{ food.Sodium }}mg</span>
-                            </div>
-                            <div class="nutrient-item">
-                                <span>纤维: </span>
-                                <span class="nutrient-value">{{ food.Fiber }}g</span>
-                            </div>
+                        <div class="nutrient-item">
+                            <span>碳水: </span>
+                            <span class="nutrient-value">{{ food.Carbohydrates }}g</span>
+                        </div>
+                        <div class="nutrient-item">
+                            <span>钠: </span>
+                            <span class="nutrient-value">{{ food.Sodium }}mg</span>
+                        </div>
+                        <div class="nutrient-item">
+                            <span>纤维: </span>
+                            <span class="nutrient-value">{{ food.Fiber }}g</span>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        </div>
+
+        <div class="card">
+                        <h2><i class="fas fa-utensils"></i> 我的饮食日志</h2>
+            <p>拖拽下方推荐食物到三餐区域，创建您的个性化饮食计划</p>
+
+            <div class="meal-planner">
+                <div class="meal-tabs">
+                    <div class="meal-tab active" data-tab="breakfast">早餐</div>
+                    <div class="meal-tab" data-tab="lunch">午餐</div>
+                    <div class="meal-tab" data-tab="dinner">晚餐</div>
+                    <div class="meal-tab" data-tab="snacks">加餐</div>
+                </div>
+
+                <div id="breakfast" class="meal-container active">
+                    <div class="meal-title"><i class="fas fa-sun"></i> 早餐</div>
+                    <div class="meal-box" id="breakfast-box">
+                        <p class="empty-message">将食物拖拽到这里</p>
+                    </div>
+                </div>
+
+                <div id="lunch" class="meal-container">
+                    <div class="meal-title"><i class="fas fa-sun"></i> 午餐</div>
+                    <div class="meal-box" id="lunch-box">
+                        <p class="empty-message">将食物拖拽到这里</p>
+                    </div>
+                </div>
+
+                <div id="dinner" class="meal-container">
+                    <div class="meal-title"><i class="fas fa-moon"></i> 晚餐</div>
+                    <div class="meal-box" id="dinner-box">
+                        <p class="empty-message">将食物拖拽到这里</p>
+                    </div>
+                </div>
+
+                <div id="snacks" class="meal-container">
+                    <div class="meal-title"><i class="fas fa-apple-alt"></i> 加餐</div>
+                    <div class="meal-box" id="snacks-box">
+                        <p class="empty-message">将食物拖拽到这里</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nutrition-summary">
+                <h3><i class="fas fa-chart-pie"></i> 今日营养总览</h3>
+
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>热量: <span id="total-calories">0</span>/{{ daily_needs.calories }} kcal</span>
+                        <span id="calories-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="calories-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>蛋白质: <span id="total-protein">0</span>/{{ daily_needs.protein }}g</span>
+                        <span id="protein-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="protein-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <div class="chart-title">三大营养素比例</div>
+                        <div class="chart-wrapper">
+                            <canvas id="macro-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">微量营养素</div>
+                        <div class="chart-wrapper">
+                            <canvas id="micro-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" id="save-plan-btn">
+                        <i class="fas fa-save"></i> 保存计划
+                    </button>
+                    <button class="btn btn-secondary" id="clear-plan-btn">
+                        <i class="fas fa-trash-alt"></i> 清空
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -504,72 +745,398 @@
         </div>
 
         <div class="card">
-    <h2>我们的科学评分体系</h2>
-    <p>为确保推荐食物的营养价值，我们开发了多维营养平衡评分系统(NutriScore 2.0)：</p>
+            <h2>我们的科学评分体系</h2>
+            <p>为确保推荐食物的营养价值，我们开发了多维营养平衡评分系统(NutriScore 2.0)：</p>
 
-    <div class="scoring-system">
-        <div class="score-category">
-            <div class="category-header">
-                <i class="fas fa-dumbbell"></i>
-                <h3>蛋白质质量</h3>
-                <span class="total-points">30分</span>
+                <div class="scoring-system">
+            <div class="score-category">
+                <div class="category-header">
+                    <i class="fas fa-dumbbell"></i>
+                    <h3>蛋白质质量</h3>
+                    <span class="total-points">30分</span>
+                </div>
+                <ul class="criteria-list">
+                    <li><span class="points">30分</span> >20g/100g</li>
+                    <li><span class="points">20分</span> >10g/100g</li>
+                    <li><span class="points">10分</span> >5g/100g</li>
+                </ul>
             </div>
-            <ul class="criteria-list">
-                <li><span class="points">30分</span> >20g/100g</li>
-                <li><span class="points">20分</span> >10g/100g</li>
-                <li><span class="points">10分</span> >5g/100g</li>
-            </ul>
+
+            <div class="score-category">
+                <div class="category-header">
+                    <i class="fas fa-seedling"></i>
+                    <h3>膳食纤维</h3>
+                    <span class="total-points">20分</span>
+                </div>
+                <ul class="criteria-list">
+                    <li><span class="points">20分</span> >5g/100g</li>
+                    <li><span class="points">10分</span> >3g/100g</li>
+                    <li><span class="points">5分</span> >1g/100g</li>
+                </ul>
+            </div>
+
+            <div class="score-category">
+                <div class="category-header">
+                    <i class="fas fa-prescription-bottle-alt"></i>
+                    <h3>钠含量</h3>
+                    <span class="total-points">20分</span>
+                </div>
+                <ul class="criteria-list">
+                    <li><span class="points">20分</span> <300mg/100g</li>
+                    <li><span class="points">10分</span> <500mg/100g</li>
+                    <li><span class="points">0分</span> ≥500mg/100g</li>
+                </ul>
+            </div>
+
+            <div class="score-category">
+                <div class="category-header">
+                    <i class="fas fa-pills"></i>
+                    <h3>维生素矿物质</h3>
+                    <span class="total-points">30分</span>
+                </div>
+                <ul class="criteria-list">
+                    <li><span class="points">15分</span> 维生素C >10mg</li>
+                    <li><span class="points">10分</span> 维生素C >5mg</li>
+                    <li><span class="points">15分</span> 铁+钙 >10mg</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="score-category">
-            <div class="category-header">
-                <i class="fas fa-seedling"></i>
-                <h3>膳食纤维</h3>
-                <span class="total-points">20分</span>
-            </div>
-            <ul class="criteria-list">
-                <li><span class="points">20分</span> >5g/100g</li>
-                <li><span class="points">10分</span> >3g/100g</li>
-                <li><span class="points">5分</span> >1g/100g</li>
-            </ul>
-        </div>
-
-        <div class="score-category">
-            <div class="category-header">
-                <i class="fas fa-prescription-bottle-alt"></i>
-                <h3>钠含量</h3>
-                <span class="total-points">20分</span>
-            </div>
-            <ul class="criteria-list">
-                <li><span class="points">20分</span> <300mg/100g</li>
-                <li><span class="points">10分</span> <500mg/100g</li>
-                <li><span class="points">0分</span> ≥500mg/100g</li>
-            </ul>
-        </div>
-
-        <div class="score-category">
-            <div class="category-header">
-                <i class="fas fa-pills"></i>
-                <h3>维生素矿物质</h3>
-                <span class="total-points">30分</span>
-            </div>
-            <ul class="criteria-list">
-                <li><span class="points">15分</span> 维生素C >10mg</li>
-                <li><span class="points">10分</span> 维生素C >5mg</li>
-                <li><span class="points">15分</span> 铁+钙 >10mg</li>
-            </ul>
-        </div>
+        <p class="scoring-note">所有推荐食物均经过此评分系统验证，确保其营养价值符合您的健康目标。</p>
+        <button class="btn" onclick="window.location.href='/'">
+            <i class="fas fa-redo"></i> 重新生成计划
+        </button>
     </div>
+</main>
 
-    <p class="scoring-note">所有推荐食物均经过此评分系统验证，确保其营养价值符合您的健康目标。</p>
-            <button class="btn" onclick="window.location.href='/'">
-                <i class="fas fa-redo"></i> 重新生成计划
-            </button>
-        </div>
-    </main>
+<footer>
+    <p>© 2025 科学营养计划生成器 | 本建议仅供参考，如有特殊健康需求请咨询专业医师</p>
+</footer>
 
-    <footer>
-        <p>© 2025 科学营养计划生成器 | 本建议仅供参考，如有特殊健康需求请咨询专业医师</p>
-    </footer>
-</body>
-</html>
+<script>
+    // 饮食日志功能实现
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化变量
+        let selectedFoods = [];
+        let macroChart = null;
+        let microChart = null;
+
+        // 初始化拖拽功能
+        initDragAndDrop();
+
+        // 初始化标签页切换
+        initMealTabs();
+
+        // 初始化图表
+        initCharts();
+
+        // 绑定事件
+        document.getElementById('save-plan-btn').addEventListener('click', saveMealPlan);
+        document.getElementById('clear-plan-btn').addEventListener('click', clearMealPlan);
+
+        // 初始化拖拽功能
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable');
+            const mealBoxes = document.querySelectorAll('.meal-box');
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', () => {
+                    draggable.classList.add('dragging');
+                });
+
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('dragging');
+                });
+            });
+
+            mealBoxes.forEach(box => {
+                box.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    box.classList.add('highlight');
+                });
+
+                box.addEventListener('dragleave', () => {
+                    box.classList.remove('highlight');
+                });
+
+                box.addEventListener('drop', e => {
+                    e.preventDefault();
+                    box.classList.remove('highlight');
+
+                    const draggable = document.querySelector('.dragging');
+                    if (draggable) {
+                        const foodData = JSON.parse(draggable.dataset.food);
+                        addFoodToMeal(box.id, foodData);
+                    }
+                });
+            });
+        }
+
+        // 初始化标签页切换
+        function initMealTabs() {
+            const tabs = document.querySelectorAll('.meal-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.meal-container').forEach(c => c.classList.remove('active'));
+
+                    // 添加active类
+                    tab.classList.add('active');
+                    const tabId = tab.dataset.tab;
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // 添加食物到餐盒
+        function addFoodToMeal(mealBoxId, foodData) {
+            const mealBox = document.getElementById(mealBoxId);
+
+            // 检查是否已存在
+            const existingFood = Array.from(mealBox.children).find(el =>
+                el.dataset && el.dataset.id === foodData.id
+            );
+
+            if (existingFood) {
+                alert('该食物已添加到此餐次');
+                return;
+            }
+
+            // 创建食物元素
+            const foodElement = document.createElement('div');
+            foodElement.className = 'dropped-food';
+            foodElement.dataset.id = foodData.id;
+            foodElement.innerHTML = `
+                <div class="food-info">
+                    <div class="food-name">${foodData['Food Names']}</div>
+                    <div class="food-calories">${foodData.Calories} kcal | 蛋白质: ${foodData.Protein}g</div>
+                </div>
+                <button class="remove-btn" data-id="${foodData.id}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            // 添加到餐盒
+            const emptyMessage = mealBox.querySelector('.empty-message');
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+            mealBox.appendChild(foodElement);
+
+            // 添加删除事件
+            foodElement.querySelector('.remove-btn').addEventListener('click', function() {
+                removeFoodFromMeal(mealBoxId, foodData.id);
+            });
+
+            // 添加到选中食物列表
+            selectedFoods.push({
+                ...foodData,
+                meal: mealBoxId.replace('-box', '')
+            });
+
+            // 更新营养统计
+            updateNutritionSummary();
+        }
+
+        // 从餐盒移除食物
+        function removeFoodFromMeal(mealBoxId, foodId) {
+            const mealBox = document.getElementById(mealBoxId);
+            const foodElement = mealBox.querySelector(`[data-id="${foodId}"]`);
+            if (foodElement) {
+                foodElement.remove();
+            }
+
+            // 从选中食物列表移除
+            selectedFoods = selectedFoods.filter(food => food.id !== foodId);
+
+            // 如果餐盒为空，显示提示消息
+            if (mealBox.children.length === 0) {
+                const emptyMsg = document.createElement('p');
+                emptyMsg.className = 'empty-message';
+                emptyMsg.textContent = '将食物拖拽到这里';
+                mealBox.appendChild(emptyMsg);
+            }
+
+            // 更新营养统计
+            updateNutritionSummary();
+        }
+
+        // 更新营养总览
+        function updateNutritionSummary() {
+            // 计算总营养
+            const totals = {
+                calories: 0,
+                protein: 0,
+                fat: 0,
+                carbs: 0,
+                fiber: 0,
+                sodium: 0,
+                vitamin_c: 0,
+                iron: 0,
+                calcium: 0
+            };
+
+            selectedFoods.forEach(food => {
+                totals.calories += food.Calories || 0;
+                totals.protein += food.Protein || 0;
+                totals.fat += food.Fat || 0;
+                totals.carbs += food.Carbohydrates || 0;
+                totals.fiber += food.Fiber || 0;
+                totals.sodium += food.Sodium || 0;
+                totals.vitamin_c += food.Vitamin_C || 0;
+                totals.iron += food.Iron || 0;
+                totals.calcium += food.Calcium || 0;
+            });
+
+            // 更新UI
+            document.getElementById('total-calories').textContent =
+                Number.isInteger(totals.calories) ? totals.calories : totals.calories.toFixed(2);
+            document.getElementById('total-protein').textContent =
+                Number.isInteger(totals.protein) ? totals.protein : totals.protein.toFixed(2);
+
+            // 计算百分比
+            const caloriesPercent = Math.min(Math.round((totals.calories / {{ daily_needs.calories }}) * 100), 100);
+            const proteinPercent = Math.min(Math.round((totals.protein / {{ daily_needs.protein }}) * 100), 100);
+
+            document.getElementById('calories-percent').textContent = `${caloriesPercent}%`;
+            document.getElementById('protein-percent').textContent = `${proteinPercent}%`;
+
+            // 更新进度条
+            document.getElementById('calories-progress').style.width = `${caloriesPercent}%`;
+            document.getElementById('protein-progress').style.width = `${proteinPercent}%`;
+
+            // 更新图表
+            updateCharts(totals);
+        }
+
+        // 初始化图表
+        function initCharts() {
+            const macroCtx = document.getElementById('macro-chart').getContext('2d');
+            const microCtx = document.getElementById('micro-chart').getContext('2d');
+
+            macroChart = new Chart(macroCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['蛋白质', '脂肪', '碳水化合物'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#FF9800',
+                            '#2196F3'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            microChart = new Chart(microCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['膳食纤维', '钠', '维生素C', '铁', '钙'],
+                    datasets: [{
+                        label: '含量 (mg)',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: '#4CAF50',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新图表数据
+        function updateCharts(totals) {
+            // 更新宏观营养素图表
+            macroChart.data.datasets[0].data = [
+                totals.protein,
+                totals.fat,
+                totals.carbs
+            ];
+            macroChart.update();
+
+            // 更新微量营养素图表
+            microChart.data.datasets[0].data = [
+                totals.fiber,
+                totals.sodium,
+                totals.vitamin_c,
+                totals.iron,
+                totals.calcium
+            ];
+            microChart.update();
+        }
+
+        // 保存饮食计划
+        function saveMealPlan() {
+            if (selectedFoods.length === 0) {
+                alert('请先添加食物到您的饮食计划');
+                return;
+            }
+
+            // 在实际应用中，这里应该发送数据到服务器保存
+            const planData = {
+                date: new Date().toISOString().split('T')[0],
+                meals: {},
+                totals: calculateTotals()
+            };
+
+            // 按餐次组织食物
+            selectedFoods.forEach(food => {
+                if (!planData.meals[food.meal]) {
+                    planData.meals[food.meal] = [];
+                }
+                planData.meals[food.meal].push({
+                    name: food['Food Names'],
+                    calories: food.Calories,
+                    protein: food.Protein,
+                    id: food.id
+                });
+            });
+
+            console.log('保存饮食计划:', planData);
+            alert('饮食计划已保存！');
+        }
+
+        // 清空饮食计划
+        function clearMealPlan() {
+            if (confirm('确定要清空当前饮食计划吗？')) {
+                selectedFoods = [];
+                document.querySelectorAll('.meal-box').forEach(box => {
+                    box.innerHTML = '<p class="empty-message">将食物拖拽到这里</p>';
+                });
+                updateNutritionSummary();
+            }
+        }
+
+        // 计算总营养
+        function calculateTotals() {
+            return selectedFoods.reduce((acc, food) => {
+                acc.calories += food.Calories || 0;
+                acc.protein += food.Protein || 0;
+                acc.fat += food.Fat || 0;
+                acc.carbs += food.Carbohydrates || 0;
+                return acc;
+            }, { calories: 0, protein: 0, fat: 0, carbs: 0 });
+        }
+    });
+</script>
