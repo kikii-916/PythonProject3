@@ -145,18 +145,24 @@ def generate_tips(foods, target):
 # ... (前面的import和load_data等函数保持不变)
 
 @app.route('/')
+def cover():
+    return render_template('cover.html')
+
+@app.route('/home')
 def home():
     return render_template('index.html')
-
 
 @app.route('/plan', methods=['POST'])
 def generate_plan():
     try:
         target = request.form['target']
-        weight = float(request.form.get('weight', 70))  # 默认70kg
-        preferences = request.form.getlist('preference')  # 获取饮食偏好列表
-        allergies = request.form.get('allergies', '')  # 获取过敏原信息
-        activity = request.form.get('activity', 'moderate')  # 获取活动量
+        weight = float(request.form.get('weight', 60))
+        height = float(request.form.get('height', 170))
+        age = int(request.form.get('age', 25))
+        gender = request.form.get('gender', 'male')
+        preferences = request.form.getlist('preference')
+        allergies = request.form.get('allergies', '')
+        activity = request.form.get('activity', 'moderate')
 
         # 根据目标和偏好筛选食物
         query_conditions = []
@@ -197,15 +203,15 @@ def generate_plan():
 
         # 根据活动量调整推荐数量
         if activity == 'sedentary':
-            sample_size = 6
+            sample_size = 9
         elif activity == 'light':
             sample_size = 9
         elif activity == 'moderate':
             sample_size = 12
         elif activity == 'active':
-            sample_size = 15
+            sample_size = 12
         else:  # extreme
-            sample_size = 15
+            sample_size = 12
 
         foods = filtered_df.sample(min(sample_size, len(filtered_df))).to_dict('records')
 
@@ -214,8 +220,8 @@ def generate_plan():
             food['score'] = calculate_nutrition_score(food)
             food['id'] = str(hash(food['Food Names']))  # 为每个食物生成唯一ID用于前端拖拽
 
-        # 计算每日营养需求 (基于体重和目标)
-        daily_needs = calculate_daily_needs(weight, target, activity)
+        # 计算每日营养需求
+        daily_needs = calculate_daily_needs(weight, height, age, gender, target, activity)
 
         # 计算整体指标
         total_calories = sum(f.get('Calories', 0) for f in foods)
@@ -232,6 +238,9 @@ def generate_plan():
                                foods=foods,
                                target=target,
                                weight=weight,
+                               height=height,
+                               age=age,
+                               gender=gender,
                                protein_ratio=round(protein_ratio, 1),
                                fiber_ratio=round(fiber_ratio, 1),
                                avg_sodium=round(avg_sodium, 1),
@@ -244,41 +253,50 @@ def generate_plan():
         return f"Error: {str(e)}", 400
 
 
-def calculate_daily_needs(weight, target, activity):
-    """计算每日营养需求"""
-    # 基础代谢率 (Harris-Benedict公式)
+def calculate_daily_needs(weight, height, age, gender, target, activity):
+    # 基础代谢率 (Mifflin-St Jeor 公式)
+    if gender == 'female':
+        bmr = 10 * weight + 6.25 * height - 5 * age - 161
+    else:  # male
+        bmr = 10 * weight + 6.25 * height - 5 * age + 5
+
+    # 活动系数
     if activity == 'sedentary':
         activity_factor = 1.2
+        protein_per_kg = 0.8  # 久坐少动: 0.8g/kg
     elif activity == 'light':
         activity_factor = 1.375
+        protein_per_kg = 1.0  # 轻度活动: 1.0g/kg
     elif activity == 'moderate':
         activity_factor = 1.55
+        protein_per_kg = 1.2  # 中度活动: 1.2g/kg
     elif activity == 'active':
         activity_factor = 1.725
+        protein_per_kg = 1.5  # 高度活跃: 1.5g/kg
     else:  # extreme
         activity_factor = 1.9
+        protein_per_kg = 1.7  # 极高强度: 1.7g/kg
 
-    bmr = 66 + (13.7 * weight) + (5 * 170) - (6.8 * 30)  # 假设身高170cm，年龄30岁
     tdee = bmr * activity_factor
 
     # 根据目标调整
     if target == 'lose_fat':
         calories = tdee * 0.8
-        protein = weight * 1.8
+        protein = weight * protein_per_kg
     elif target == 'gain_muscle':
         calories = tdee * 1.1
-        protein = weight * 2.2
+        protein = weight * (protein_per_kg + 0.3)  # 增肌比常规多0.3g/kg
     elif target == 'hypertension':
         calories = tdee
-        protein = weight * 1.2
-        sodium = 1500  # 低钠标准
+        protein = weight * protein_per_kg
+        sodium = 1500  # 高血压患者建议更低
     elif target == 'diabetes':
         calories = tdee * 0.9
-        protein = weight * 1.5
+        protein = weight * protein_per_kg
         carbs = calories * 0.4 / 4  # 40%热量来自碳水
     else:  # balanced
         calories = tdee
-        protein = weight * 1.5
+        protein = weight * protein_per_kg
 
     # 设置默认值
     needs = {
@@ -286,35 +304,29 @@ def calculate_daily_needs(weight, target, activity):
         'protein': round(protein, 1),
         'carbs': round(calories * 0.5 / 4, 1),  # 50%热量来自碳水
         'fat': round(calories * 0.3 / 9, 1),  # 30%热量来自脂肪
-        'fiber': 25,  # 默认25g膳食纤维
-        'sodium': 2000  # 默认2000mg钠
+        'fiber': 25,  # 固定25g膳食纤维
+        'sodium': 2000,  # 钠摄入量限制2000mg
+        'bmr': round(bmr),  # 添加BMR显示
+        'tdee': round(tdee)  # 添加TDEE显示
     }
 
     # 特殊目标调整
     if target == 'hypertension':
-        needs['sodium'] = 1500
-    if target == 'diabetes':
-        needs['carbs'] = round(carbs, 1)
+        needs['sodium'] = 1500  # 高血压患者建议更低
 
     return needs
 
 
 @app.route('/foods', methods=['GET'])
 def get_foods():
-    """获取所有食物数据供前端搜索和拖拽"""
     try:
-        search = request.args.get('search', '')
-        target = request.args.get('target', 'balanced')
-
-        # 基本筛选
-        if target == 'lose_fat':
-            filtered = df[(df['Calories'] < 300) & (df['Protein'] > 10)]
-        elif target == 'hypertension':
-            filtered = df[df['Sodium'] < 300]
-        elif target == 'diabetes':
-            filtered = df[(df['Fiber'] > 3) & (df['Carbohydrates'] < 30)]
+        search = request.args.get('search', '').strip()
+        # 使用更高效的搜索方法
+        if search:
+            mask = df['Food Names'].str.contains(search, case=False, na=False)
+            filtered = df[mask].copy()
         else:
-            filtered = df
+            filtered = df.copy()
 
         # 搜索筛选
         if search:
@@ -329,6 +341,7 @@ def get_foods():
         return {'success': True, 'foods': foods}
     except Exception as e:
         return {'success': False, 'error': str(e)}
+
 
 
 @app.route('/calculate', methods=['POST'])

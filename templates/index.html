@@ -8,18 +8,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #4CAF50;
-            --primary-dark: #388E3C;
-            --secondary: #2196F3;
-            --warning: #FF9800;
-            --danger: #F44336;
-            --light: #f5f5f5;
-            --medium: #e0e0e0;
-            --dark: #212121;
-            --white: #ffffff;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-            --radius: 8px;
+            --primary: #BCDDBE;
+            --primary-light: #E8F5E9;
+            --primary-dark: #8BC34A;
+            --primary-bg: #F9FBF8;
+            --secondary: #bad077;
+            --secondary-light: #E8F5C8;
+            --accent: #A5D6A7;
+            --accent-light: #D7ECC8;
+            --warning: #D4A373;
+            --warning-light: #FAEDCD;
+            --danger: #D08C60;
+            --danger-light: #F8EDEB;
+            --light: #F9FBF8;
+            --lighter: #FFFFFF;
+            --medium: #E0D6CC;
+            --dark: #5C4D3D;
+            --darker: #3E352A;
+            --text-primary: #3E352A;
+            --text-secondary: #5C4D3D;
+            --text-muted: #7A6A5A;
+            /* 🗝️ 同步字体大小系统 */
+            --font-base: 1rem;
+            --font-sm: 0.875rem;
+            --font-xs: 0.75rem;
+            --font-md: 1rem;
+            --font-lg: 1.25rem;
+            --font-xl: 1.5rem;
+            --font-xxl: 2rem;
+            --font-heading: 2.5rem;
+            --font-display: 3rem;
         }
 
         * {
@@ -29,16 +47,25 @@
         }
 
         body {
-            font-family: 'Noto Sans SC', sans-serif;
+            font-family: 'Noto Serif SC', serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 400;
             line-height: 1.6;
             color: var(--dark);
-            background-color: #f9f9f9;
+            background: var(--primary-light);;
         }
 
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Roboto', 'Noto Serif SC', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--darker);
+            letter-spacing: -0.02em;
         }
 
         header {
@@ -69,10 +96,23 @@
             z-index: 1;
         }
 
+        .header-content h1 {
+            font-family: 'Roboto', 'Noto Serif SC', sans-serif;
+            font-weight: 900 !important; /* 强制最粗字体 */
+            font-size: 3rem !important; /* 强制字号 */
+            color: white !important; /* 强制白色 */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: var(--space-sm);
+        }
+
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
+            font-family: 'Roboto', 'Noto Serif SC', sans-serif; /* 确保字体一致 */
+            font-weight: 900; /* 最粗字体 */
+            font-size: 3rem; /* 直接指定 3rem，避免变量影响 */
+            color: white; /* 强制白色（和 header-content 一致） */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: var(--space-sm);
+            letter-spacing: -0.03em; /* 可选：微调字距 */
         }
 
         .subtitle {
@@ -81,14 +121,15 @@
             font-weight: 300;
             max-width: 700px;
             margin: 0 auto;
+            color: white !important;
         }
 
         .card {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 2rem;
+            background: var(--light);
+            border-radius: var(--radius-lg); /* 16px */
+            padding: 2.5rem;
             box-shadow: var(--shadow);
-            margin-bottom: 2rem;
+            color: var(--text-primary);
         }
 
         .form-group {
@@ -97,9 +138,11 @@
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--dark);
+            margin-bottom: 0.75rem;    /* 增加间距 */
+            font-weight: 600;          /* 从500提升到600 */
+            color: var(--darker);      /* 使用更深的颜色 */
+            font-size: var(--font-lg); /* 1.25rem */
+            letter-spacing: 0.02em;    /* 轻微字距提升可读性 */
         }
 
         input, select {
@@ -107,7 +150,7 @@
             padding: 12px 15px;
             border: 1px solid var(--medium);
             border-radius: var(--radius);
-            font-size: 1rem;
+            font-size: 1.125rem;
             transition: var(--transition);
             font-family: inherit;
         }
@@ -126,7 +169,7 @@
             border-radius: var(--radius);
             cursor: pointer;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 700;
             width: 100%;
             transition: var(--transition);
             display: inline-block;
@@ -244,14 +287,12 @@
         }
 
         .form-section-title {
-            font-size: 1.1rem;
-            color: var(--primary-dark);
-            margin: 1.5rem 0 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            font-size: var(--font-xl);  /* 从1.1rem升级到1.5rem */
+            font-weight: 700;          /* 加粗 */
+            color: var(--darker);       /* 使用最深的文字颜色 */
+            margin: 2rem 0 1.5rem;     /* 增加间距 */
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--primary); /* 加粗分隔线 */
         }
 
         .form-section-title i {
@@ -270,7 +311,8 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.75rem;
+            padding: 1rem;
+            font-weight: 500;
             background: var(--light);
             border-radius: var(--radius);
             transition: var(--transition);
@@ -389,30 +431,51 @@
     </style>
 </head>
 <body>
-    <header>
-<div class="header-content">
+
+<header>
+        <div class="header-content">
             <h1>科学营养计划生成器</h1>
             <p class="subtitle">基于专业营养学数据，为您定制个性化饮食方案</p>
         </div>
-    </header>
+</header>
 
     <main class="container">
         <div class="card">
             <form id="nutrition-form" action="/plan" method="POST">
                 <div class="form-group">
-                    <label for="weight">您的体重 (kg)</label>
-                    <input type="number" id="weight" name="weight" min="30" max="200" required>
+                    <label for="gender">🥒 性别</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">-- 请选择 --</option>
+                        <option value="male">🙋🏻男</option>
+                        <option value="female">🙋🏻‍♀️女</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="target">您的营养目标</label>
+                    <label for="age">🥦 年龄 (岁)</label>
+                    <input type="number" id="age" name="age" min="1" max="120" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">🥬 您的体重 (kg)</label>
+                    <input type="number" id="weight" name="weight" min="30" max="200" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="height">🫑 身高 (cm)</label>
+                    <input type="number" id="height" name="height" min="100" max="250" required>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="target">🥝 您的营养目标</label>
                     <select id="target" name="target" required>
                         <option value="">-- 请选择 --</option>
-                        <option value="lose_fat">减脂/控制体重</option>
-                        <option value="gain_muscle">增肌/塑形</option>
-                        <option value="hypertension">控制血压</option>
-                        <option value="diabetes">控制血糖</option>
-                        <option value="balanced">均衡饮食</option>
+                        <option value="lose_fat">🧘🏻‍♀️减脂/控制体重</option>
+                        <option value="gain_muscle">🏋🏻增肌/塑形</option>
+                        <option value="hypertension">👩🏻‍⚕️控制血压</option>
+                        <option value="diabetes">🍬控制血糖</option>
+                        <option value="balanced">🍲均衡饮食</option>
                     </select>
                 </div>
 
@@ -462,11 +525,11 @@
                 <div class="form-group">
                     <label for="activity">日常活动量</label>
                     <select id="activity" name="activity" required>
-                        <option value="sedentary">久坐少动</option>
-                        <option value="light">轻度活动(每周1-3次运动)</option>
-                        <option value="moderate">中度活动(每周3-5次运动)</option>
-                        <option value="active">高度活跃(每周6-7次运动)</option>
-                        <option value="extreme">极高强度(运动员级别)</option>
+                        <option value="sedentary">🛋️久坐少动</option>
+                        <option value="light">🚶轻度活动(每周1-3次运动)</option>
+                        <option value="moderate">🏃中度活动(每周3-5次运动)</option>
+                        <option value="active">🏋️高度活跃(每周6-7次运动)</option>
+                        <option value="extreme">🔥极高强度(运动员级别)</option>
                     </select>
                 </div>
 
@@ -517,8 +580,19 @@
     <script>
         document.getElementById('nutrition-form').addEventListener('submit', function(e) {
             const weight = document.getElementById('weight').value;
+            const height = document.getElementById('height').value;
+            const age = document.getElementById('age').value;
+
             if (weight < 30 || weight > 200) {
                 alert('请输入合理的体重值(30-200kg)');
+                e.preventDefault();
+            }
+            if (height < 100 || height > 250) {
+                alert('请输入合理的身高值(100-250cm)');
+                e.preventDefault();
+            }
+            if (age < 1 || age > 120) {
+                alert('请输入合理的年龄(1-120岁)');
                 e.preventDefault();
             }
         });
