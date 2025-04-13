@@ -8,16 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #BCDDBE;       /* 主绿色（result页面风格） */
-            --primary-dark: #8BB58D;  /* 深绿色 */
-            --primary-light: #E8F5E9; /* 浅绿色背景 */
-            --secondary: #4FC3F7;     /* 蓝色（次要颜色） */
-            --warning: #FFD54F;       /* 黄色（警告） */
-            --danger: #E57373;        /* 红色（危险） */
-            --light: #F9FBF8;         /* 页面背景浅绿色 */
-            --dark: #263238;          /* 深灰色文字 */
-            --text-primary: #2E7D32;  /* 主文字绿色 */
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 更柔和的阴影 */
+            --primary: #BCDDBE;
+            --primary-dark: #8BB58D;
+            --primary-light: #E8F5E9;
+            --secondary: #4FC3F7;
+            --warning: #FFD54F;
+            --danger: #E57373;
+            --light: #F9FBF8;
+            --dark: #263238;
+            --text-primary: #2E7D32;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         * {
@@ -31,7 +31,7 @@
             font-weight: 400;
             line-height: 1.6;
             color: var(--dark);
-            background: var(--light); /* 浅绿色背景 */
+            background: var(--light);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -50,7 +50,7 @@
             margin-bottom: 2rem;
             position: relative;
             z-index: 0;
-            box-shadow: none; /* 移除阴影 */
+            box-shadow: none;
         }
 
         .header-content h1 {
@@ -92,12 +92,12 @@
         }
 
         .card {
-            background: var(--primary-light); /* 浅绿色卡片背景 */
-            border-radius: 12px; /* 更大的圆角 */
+            background: var(--primary-light);
+            border-radius: 12px;
             padding: 2rem;
             box-shadow: var(--shadow);
             margin-bottom: 2rem;
-            border: 1px solid rgba(0, 0, 0, 0.05); /* 轻微边框 */
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
 
@@ -138,7 +138,7 @@
         }
 
         .nutrient-card {
-            background: rgba(255, 255, 255, 0.8); /* 半透明白色 */
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 8px;
             padding: 1rem;
             text-align: center;
@@ -148,7 +148,7 @@
         .nutrient-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--text-primary); /* 绿色文字 */
+            color: var(--text-primary);
             margin: 0.5rem 0;
         }
 
@@ -253,10 +253,10 @@
     <header>
         <div class="header-content">
             <button class="nav-btn" onclick="window.history.back()">
-                <i class="fas fa-arrow-left"></i> 返回
+                <i class="fas fa-arrow-left"></i> Back
             </button>
             <h1>{{ food['Food Names'] }}</h1>
-            <p>每100克可食用部分的营养成分</p>
+            <p>Nutritional components per 100 grams of edible portion</p>
         </div>
     </header>
 
@@ -265,69 +265,69 @@
             <div class="food-header">
                 <h2>{{ food['Food Names'] }}</h2>
                 <div class="food-score {% if food.score >= 70 %}score-high{% elif food.score >= 40 %}score-medium{% else %}score-low{% endif %}">
-                    营养评分: {{ food.score }}/100
+                    Nutritional Score: {{ food.score }}/100
                 </div>
             </div>
 
             <div class="nutrient-grid">
                 <div class="nutrient-card">
                     <div class="nutrient-value">{{ food.Calories }}</div>
-                    <div class="nutrient-label">卡路里 (kcal)</div>
+                    <div class="nutrient-label">Calories (kcal)</div>
                 </div>
                 <div class="nutrient-card">
                     <div class="nutrient-value">{{ food.Protein }}g</div>
-                    <div class="nutrient-label">蛋白质</div>
+                    <div class="nutrient-label">Protein</div>
                 </div>
                 <div class="nutrient-card">
                     <div class="nutrient-value">{{ food.Fat }}g</div>
-                    <div class="nutrient-label">脂肪</div>
+                    <div class="nutrient-label">Fat</div>
                 </div>
                 <div class="nutrient-card">
                     <div class="nutrient-value">{{ food.Carbohydrates }}g</div>
-                    <div class="nutrient-label">碳水化合物</div>
+                    <div class="nutrient-label">Carbohydrates</div>
                 </div>
             </div>
 
             <div class="nutrition-facts">
-                <div class="nutrition-title">详细营养成分</div>
+                <div class="nutrition-title">Detailed Nutritional Components</div>
 
                 <div class="nutrition-row">
-                    <span class="nutrition-name">膳食纤维</span>
+                    <span class="nutrition-name">Fiber</span>
                     <span class="nutrition-value">{{ food.Fiber }}g</span>
                 </div>
                 <div class="nutrition-row">
-                    <span class="nutrition-name">糖分</span>
+                    <span class="nutrition-name">Sugars</span>
                     <span class="nutrition-value">{{ food.Sugars }}g</span>
                 </div>
                 <div class="nutrition-row">
-                    <span class="nutrition-name">钠</span>
+                    <span class="nutrition-name">Sodium</span>
                     <span class="nutrition-value">{{ food.Sodium }}mg</span>
                 </div>
                 <div class="nutrition-row">
-                    <span class="nutrition-name">维生素C</span>
+                    <span class="nutrition-name">Vitamin C</span>
                     <span class="nutrition-value">{{ food.Vitamin_C }}mg</span>
                 </div>
                 <div class="nutrition-row">
-                    <span class="nutrition-name">铁</span>
+                    <span class="nutrition-name">Iron</span>
                     <span class="nutrition-value">{{ food.Iron }}mg</span>
                 </div>
                 <div class="nutrition-row">
-                    <span class="nutrition-name">钙</span>
+                    <span class="nutrition-name">Calcium</span>
                     <span class="nutrition-value">{{ food.Calcium }}mg</span>
                 </div>
             </div>
 
-            <h3>营养评分说明</h3>
-            <p>我们的评分系统(0-100分)综合考虑了蛋白质质量、膳食纤维含量、钠含量以及维生素矿物质含量。分数越高表示该食物营养价值越高，越适合健康饮食。</p>
+            <h3>Explanation of Nutritional Score</h3>
+            <p>Our scoring system (0-100 points) takes into account protein quality, dietary fiber content, sodium content, and vitamin and mineral content. The higher the score, the higher the nutritional value of the food and the more suitable it is for a healthy diet.</p>
 
             <button class="btn" onclick="window.history.back()">
-                <i class="fas fa-arrow-left"></i> 返回计划
+                <i class="fas fa-arrow-left"></i> Return to Plan
             </button>
         </div>
     </main>
 
     <footer>
-        <p>© 2025 科学营养计划生成器 | 数据来源: 中国食物成分表</p>
+        <p>© 2025 Science-Based Nutrition Plan Generator | This advice is for reference only. Consult a professional physician for special health needs.</p>
     </footer>
 </body>
 </html>
